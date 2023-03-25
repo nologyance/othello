@@ -1,0 +1,174 @@
+openapi: 3.0.0
+info:
+  version: "1.0.0"
+  title: Othello Game API
+  description: REST API for playing Othello game
+servers:
+  - url: "http://localhost:8000/api/v1"
+paths:
+  /games:
+    post:
+      summary: Create a new game
+      description: Create a new game with a specified player as the starting player
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                player_id:
+                  type: integer
+                  description: The ID of the player who starts the game
+                  example: 1
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  game_id:
+                    type: integer
+                    description: The ID of the created game
+                    example: 123
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    description: The error message
+                    example: "Invalid player ID"
+  /games/{game_id}:
+    get:
+      summary: Get the current state of a game
+      description: Get the current state of a game, including the current board state and the current player's ID
+      parameters:
+        - in: path
+          name: game_id
+          required: true
+          schema:
+            type: integer
+          description: The ID of the game to get the state of
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  game_id:
+                    type: integer
+                    description: The ID of the game
+                    example: 123
+                  board_state:
+                    type: string
+                    description: The current board state, represented as a string
+                    example: "...........................OX......XO..........................."
+                  current_turn_player_id:
+                    type: integer
+                    description: The ID of the player who has the current turn
+                    example: 1
+        "404":
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    description: The error message
+                    example: "Game not found"
+    put:
+      summary: Execute a move in the game
+      description: Execute a move in the game, specified by the player ID, the x and y coordinates of the move, and the token to verify the player's identity
+      parameters:
+        - in: path
+          name: game_id
+          required: true
+          schema:
+            type: integer
+          description: The ID of the game to execute the move in
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                player_id:
+                  type: integer
+                  description: The ID of the player who executes the move
+                  example: 1
+                x_coordinate:
+                  type: integer
+                  description: The x coordinate of the move
+                  example: 3
+                y_coordinate:
+                  type: integer
+              description: The y coordinate of the move
+              example: 4
+            token:
+              type: string
+              description: The token to verify the identity of the player
+              example: "abc123"
+  responses:
+    "200":
+      description: OK
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              game_id:
+                type: integer
+                description: The ID of the game
+                example: 123
+              board_state:
+                type: string
+                description: The updated board state, represented as a string
+                example: "...........................OOO.....XXO..........................."
+              current_turn_player_id:
+                type: integer
+                description: The ID of the player who has the current turn
+                example: 2
+    "400":
+      description: Bad Request
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+                description: The error message
+                example: "Invalid move"
+    "401":
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+                description: The error message
+                example: "Invalid token"
+    "404":
+      description: Not Found
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+                description: The error message
+                example: "Game not found"
