@@ -4,10 +4,10 @@ import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RestController
 
 @RestController
-class GameController {
+class GameController(val gameDomaRepository: GameDomaRepository) {
 
     @GetMapping("/game")
-    fun getGame(): Game {
-        return Game()
+    fun getGame(): List<Game> {
+        return gameDomaRepository.getGame()
     }
 }
